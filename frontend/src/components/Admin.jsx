@@ -8,9 +8,21 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Table } from '@mantine/core';
+import { ActionIcon, Table, Menu } from '@mantine/core';
+import useGetAllUsers from "../../hooks/user/use-get-all-users";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import { useQuery } from "react-query";
+import axios from "axios";
 
 const Admin = () => {
+
+  const {data: users, isLoading, isError} = useGetAllUsers();
+  // const {data: transaction, isLoading: transactionLoading, isError: transactionError} = getTransactions();
+
+
+  console.log(users)
+
   const data = [
     {
       name: "Week 1",
@@ -93,16 +105,52 @@ const Admin = () => {
               <th>Name</th>
               <th>Address</th>
               <th>Phone</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>jd cghsd</td>
-              <td>akfbad</td>
-              <td>akbad</td>
-              <td>adjhcsd</td>
-              <td>ajdh csad</td>
-            </tr>
+           {
+            users?.users?.map((user)=>{
+              return (
+                <tr>
+                  <td>{user.ID}</td>
+                  <td>{user.email}</td>
+                  <td>{user.name}</td>
+                  <td>{user.address}</td>
+                  <td>{user.phone_no}</td>
+                  <td>
+                    <Menu width={200} shadow="sm">
+                      <Menu.Target>
+                        <ActionIcon>
+                          <FontAwesomeIcon icon={faEllipsis} />
+                        </ActionIcon>
+                      </Menu.Target>
+
+                      <Menu.Dropdown>
+                        <Menu.Label>Change meeting state</Menu.Label>
+                        <Menu.Item onClick={() => {
+                          meeting.action = "held";
+                          setStatusModal(meeting)
+                        }}>
+                          show account information
+                        </Menu.Item>
+                        <Menu.Item onClick={() => {
+                          useQuery(["all-users"], async () => {
+                            const res = await axios.get(`http://localhost:3000/api/users/transactions`);
+                            console.log(res)
+
+                          })
+                        }}>
+                          show all transactions
+                        </Menu.Item>
+                      </Menu.Dropdown>
+
+                    </Menu>
+                  </td>
+                </tr>
+              )
+            })
+           }
           </tbody>
         </Table>
       </div>
