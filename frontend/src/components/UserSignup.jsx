@@ -1,22 +1,37 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { signupSchema } from "../../schemas/signupSchema";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { clsx } from "@mantine/core";
+import axios from 'axios';
+import useAddUserMutation from '../../hooks/user/use-add-user';
 
 const UserSignup = () => {
-    const {
-        register,
-        formState: { errors },
-        handleSubmit,
-      } = useForm({
-        resolver: yupResolver(signupSchema),
-      });
-    
-      const onSignup = (data) => {
-        console.log(data); //comeback to this for database call
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm({
+    resolver: yupResolver(signupSchema),
+  });
+
+
+  const {mutate: addUser, isLoading, isError} = useAddUserMutation();
+
+  const onSignup = async (data) => {
+    console.log(data); //comeback to this for database call
+    addUser({
+      ...data
+    }, {
+      onSuccess: ()=>{
+        console.log("User added")
+      },
+      onError: () => {
+        console.log("Error adding user")
       }
+    })
+  }
   return (
     <div className="h-screen w-full flex flex-col px-4 justify-center items-center m-auto bg-bglayer bg-no-repeat bg-cover gap-7">
       {/* Container div to give border */}
@@ -44,8 +59,8 @@ const UserSignup = () => {
               id=""
               placeholder="Password..."
               className={clsx("input input-primary rounded-md input-md xl:input-lg placeholder:italic placeholder:pl-1 indent-5 w-full border-primary focus:outline-primary", errors?.password && "border-error focus:outline-error")}
-                
-                {...register("password")}
+
+              {...register("password")}
             />
 
           </div>
@@ -91,13 +106,20 @@ const UserSignup = () => {
               className="w-full rounded-xl btn btn-primary bg-primary border-primary hover:bg-secondary hover:border-primary"
             />
           </div>
+          <select name="" id=""
+            {...register("branch")}>
+            <option value="">select branch</option>
+            <option value="newyork">New York</option>
+            <option value="london">London</option>
+            <option value="paris">Paris</option>
+          </select>
         </form>
       </div>
       <div className="px-2 sm:p-0">
         <span className="text-gray-500">
           Already have an account?{" "}
           <Link to="/login" className="font-bold link link-primary text-primary hover:text-secondary">
-              Login
+            Login
           </Link>
         </span>
       </div>

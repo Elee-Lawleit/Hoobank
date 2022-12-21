@@ -7,6 +7,9 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const adminRouter = require("./routes/admin")
+const session = require("express-session")
+const cors = require("cors")
+const FileStore = require("session-file-store")(session);
 
 var app = express();
 
@@ -20,9 +23,27 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(session({
+  name: "session-id",
+  secret: "Sample Cookie Parser Key",
+  saveUninitialized: false,
+  resave: false,
+  store: new FileStore({ path: "./sessions/", retries: 0 })
+}));
+
+const corsOptions = {
+  origin: 'http://local.host:3000',  //Your Client, do not write '*'
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
 app.use("/api/admin", adminRouter)
+
+app.all("*", (req, res, next)=>{
+  res.send({ msg: "Landed on a 404"})
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

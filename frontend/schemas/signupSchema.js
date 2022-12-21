@@ -6,4 +6,5 @@ export const signupSchema = yup.object().shape({
   name: yup.string().required(),
   address: yup.string().required(),
   phone: yup.string().required(),
+  branch: yup.string().required()
 });
